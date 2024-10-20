@@ -1,0 +1,39 @@
+# Python
+*.pyc
+*.pyo
+__pycache__/
+*.pyd
+
+# Environment
+.env
+*.env
+
+# Virtual Environment
+venv/
+env/
+.venv/
+
+# IDEs
+.idea/
+
+# Jupyter Notebooks
+.ipynb_checkpoints/
+
+# Distribution / Packaging
+build/
+dist/
+*.egg-info/
+
+# Test coverage
+*.coverage
+*.coverage.*
+nosetests.xml
+coverage.xml
+*.hypothesis/
+
+# Logs
+*.log
+
+# Miscellaneous
+*.bak
+*.swp
