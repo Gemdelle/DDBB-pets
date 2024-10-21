@@ -37,25 +37,25 @@ async def load_data(view: str):
 
 async def update_table():
     print("Updating table...")
-    loading_label.visible = True  # Show loading label
+    loading_label.visible = True
     columns, rows = await load_data('view_mascota_detalle')
-    loading_label.visible = False  # Hide loading label
+    loading_label.visible = False
 
     if columns and rows:
-        table.columns = columns  # Set columns
-        table.rows = rows  # Set rows
+        table.columns = columns
+        table.rows = rows
         ui.notify(f"Loaded {len(rows)} rows of data", color="green")
-        print(f"Table updated with {len(rows)} rows")  # Debug output
+        print(f"Table updated with {len(rows)} rows")
     else:
         ui.notify('No data available or error occurred', color="orange")
-        print("No data available or error occurred")  # Debug output
+        print("No data available or error occurred")
 
 
 @ui.page('/')
 def main():
     global table, loading_label
 
-    # Set background image for the body using CSS
+
     ui.add_css('body { '
                 'background-image: url("https://drive.google.com/thumbnail?id=1BRjmEroGeHaHgh6LbINNOeXsLs5kl95i&sz=w1000&format=png"); '
                 'background-size: cover; '
@@ -69,10 +69,10 @@ def main():
         with ui.row().classes('w-full items-center'):
             ui.label('Pet Details Database').classes('text-2xl mb-4')
 
-        # Scrollable horizontal container
+
         with ui.row().classes('w-full').style('height: 500px; display: flex; flex-wrap: nowrap; overflow-x: scroll;'):
-            # Cargar datos en filas de la tabla
-            for i in range(10):  # Simulando 10 filas
+
+            for i in range(10):
                 with ui.column().classes('flex items-center justify-center').style('''
                     width: 200px; 
                     height: 300px; 
@@ -89,5 +89,4 @@ def main():
 
 
 
-# Run the application
 ui.run()
