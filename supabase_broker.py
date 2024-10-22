@@ -53,12 +53,75 @@ async def update_table():
         ui.notify('No data available or error occurred', color="orange")
         print("No data available or error occurred")
 
+def create_header_nav():
+    with ui.row().classes():
+        ui.row().classes('header')
 
-@ui.page('/')
-def main():
+    with ui.row().classes('nav'):
+        with ui.column().classes('nav-button home-circle').on('click', lambda: ui.navigate.to('/')):
+            ui.label('M a s c o t a s')
+        with ui.column().classes('nav-button home-circle').on('click', lambda: ui.navigate.to('/interesados')):
+            ui.label('I n t e r e s a d o s')
+        with ui.column().classes('nav-button home-circle').on('click', lambda: ui.navigate.to('/veterinaria')):
+            ui.label('V e t e r i n a r i a')
+
+@ui.page('/interesados')
+def interesados_page():
     global table, loading_label
 
-    ui.add_css('''    
+    ui.add_css(common_css + additional_css)
+
+    with ui.column().classes('w-full h-full items-center no-gap'):
+        create_header_nav()
+
+        with ui.row().classes('title-container'):
+            ui.label('I N T E R E S A D O S').classes('page-title')
+
+        ui.row().classes('container overflow-x-auto')
+
+
+
+@ui.page('/veterinaria')
+def veterinaria_page():
+    global table, loading_label
+
+    ui.add_css(common_css + additional_css)
+
+    with ui.column().classes('w-full h-full items-center no-gap'):
+        create_header_nav()
+
+        with ui.row().classes('title-container'):
+            ui.label('V E T E R I N A R I A').classes('page-title')
+
+        ui.row().classes('container overflow-x-auto')
+
+
+# Add these CSS classes to your existing CSS
+additional_css = '''
+    .pet-card.bone-yellow {
+        background-image: url("https://drive.google.com/thumbnail?id=1fnXmKmLMcoMN9k9OIrcSzComyw6fPCSb&sz=w1000&format=png");
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: contain;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-transform: uppercase;
+    }
+
+    .pet-card.bone-pink {
+        background-image: url("https://drive.google.com/thumbnail?id=16hd19sOhwTH7qk2VvFDQLLkpwMgtAg_A&sz=w1000&format=png");
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: contain;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-transform: uppercase;
+    }
+'''
+
+common_css = '''    
         body {
             background-image: url("https://drive.google.com/thumbnail?id=1NoLgwKw_wqB7kbtcBBigVNlxZ3Xbqj3A&sz=w1000&format=png");
             background-size: 100% 100%;
@@ -77,7 +140,7 @@ def main():
             height: 16vh;
             width: 10vw;
             margin: 0 auto;
-            margin-top: 4vh;
+            margin-top: 7vh;
             margin-bottom: 0;
         }
         .nav {
@@ -180,65 +243,68 @@ def main():
         }
         .pet-img {
             width: 100%;
-            height: 100%;
-            position: absolute;
-            top: 0;
-            background-size: 100% 100%;
-            background-repeat: no-repeat;
-            background-image: url("https://drive.google.com/thumbnail?id=1iVJXodlKPDRGEbRbwMMlmJI1yprGCNfL&sz=w1000&format=png");
+                height: 100%;
+                position: absolute;
+                top: 0;
+                background-size: 100% 100%;
+                background-repeat: no-repeat;
+                background-image: url("https://drive.google.com/thumbnail?id=1iVJXodlKPDRGEbRbwMMlmJI1yprGCNfL&sz=w1000&format=png");
             background-position: center;
             z-index: 99;
         }
         .pet-photo {
             background-size: 100% 100%;
-            background-repeat: no-repeat;
-            background-image: url("https://lh3.googleusercontent.com/d/1_UBEmmBTTvt4mihRm-BevaqYvmFu2mt-=w1000?authuser=0");
-            background-position: center;
-            border-radius: 50%;
-            width: 80%;
-            height: 80%;
+                background-repeat: no-repeat;
+                background-image: url("https://lh3.googleusercontent.com/d/1_UBEmmBTTvt4mihRm-BevaqYvmFu2mt-=w1000?authuser=0");
+                background-position: center;
+                border-radius: 50%;
+                width: 80%;
+                height: 80%;
             margin: 0 auto;
             margin-top: 2vh;
             z-index: 1;
         }
         .pet-photo-container {
             width: 80%;
-            height: 50%;
+            height: 45%;
             top: 0;
             position: relative;
-        }
-        .container {
-            display: flex;
-            justify-content: center;
-            height: 49vh;
-        }
-        .pet-card {
-            margin: 1%;
-            position: relative;
-            width: 28vh;
-            height: 95%;
-            border-radius: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-end;
-        }
-    ''')
+            }
+            .container {
+                display: flex;
+                justify-content: center;
+                height: 49vh;
+            }
+            .pet-card {
+                margin: 1%;
+                position: relative;
+                width: 28vh;
+                height: 95%;
+                border-radius: 20px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: flex-end;
+            }
+            .page-title {
+                font-size: 2.2vh;
+            }
+            .no-gap {
+                gap: unset;
+            }
+        '''
 
-    with ui.column().classes('w-full h-full items-center'):
-        with ui.row().classes():
-            ui.row().classes('header')  # Logo URL
+@ui.page('/')
+def main():
+    global table, loading_label
 
-        with ui.row().classes('nav'):
-            with ui.column().classes('nav-button home-circle').on('click', lambda: ui.open('/mascotas')):
-                ui.label('M a s c o t a s')  # Hueso Azul como fondo
-            with ui.column().classes('nav-button home-circle').on('click', lambda: ui.open('/interesados')):
-                ui.label('I n t e r e s a d o s')  # Hueso Amarillo como fondo
-            with ui.column().classes('nav-button home-circle').on('click', lambda: ui.open('/veterinaria')):
-                ui.label('V e t e r i n a r i a')  # Hueso Rosado como fondo
+    ui.add_css(common_css + additional_css)
+
+    with ui.column().classes('w-full h-full items-center no-gap'):
+        create_header_nav()
 
         with ui.row().classes('title-container'):
-            ui.label('M A S C O T A S')
+            ui.label('M A S C O T A S').classes('page-title')
 
         with ui.row().classes('container overflow-x-auto'):
             # Carta de la mascota 1
@@ -292,8 +358,8 @@ def main():
                     ui.label('Estado: Rescatado')
                     ui.label('Temperamento: Amistoso')
                     ui.label('Treat: Comida')
-                    ui.label('Comida: Ración')                
-            
+                    ui.label('Comida: Ración')
+
             with ui.column().classes('pet-card bone-blue'):
                 ui.label('12').classes('paw-number')  # Número en la patita
                 with ui.label('Lala').classes('bone-name'):  # Nombre en el hueso rosa central
