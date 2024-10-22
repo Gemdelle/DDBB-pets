@@ -25,7 +25,6 @@ broker = SupabaseBroker(
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV0aW51dXdsZXdjaWNsbGlwYW9jIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjcwOTQxNzcsImV4cCI6MjA0MjY3MDE3N30.b449FFa7ZXqFEFcGTx2Yo9SwknQWKXYrSZYiPhwX-ig'
 )
 
-
 def create_pet_card(pet_data):
     if pet_data["genero"] == "Macho":
         paw_number_class = 'paw-number-blue'
@@ -53,7 +52,6 @@ def create_pet_card(pet_data):
             ui.label(f'Comida: {pet_data["comida"]}').classes('description-text')
             ui.label(f'Ración: {pet_data["racion_kg"]} kg').classes('description-text')
             ui.label(f'Peso: {pet_data["peso"]} kg').classes('description-text')
-            ui.label(f'Género: {pet_data["genero"]}').classes('description-text')
 
 def create_header_nav():
     with ui.row().classes():
@@ -70,7 +68,18 @@ def create_header_nav():
 
 @ui.page('/')
 async def main():
-    ui.add_css(common_css + additional_css)
+    ui.add_css(common_css + additional_css + '''
+        body {
+            background-image: url("https://drive.google.com/thumbnail?id=1NoLgwKw_wqB7kbtcBBigVNlxZ3Xbqj3A&sz=w1000&format=png");
+            background-size: 100% 100%;
+            background-position: center;
+            background-repeat: no-repeat;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+            font-family: 'Georgia', serif;
+        }
+    ''')
 
     with ui.column().classes('w-full h-full items-center no-gap'):
         create_header_nav()
@@ -87,9 +96,98 @@ async def main():
                 ui.label('No hay mascotas disponibles').classes('text-lg text-gray-500')
 
 
+def create_interesados_cards(pet_data):
+    veterinarios = []
+    duenos = []
+    donantes = []
+    guardians = []
+
+    for pet in pet_data:
+        card_type = pet.get("tipo_persona")
+        nombre_persona = pet.get("nombre_persona", "Unknown")
+
+        if card_type == "Veterinario":
+            veterinarios.append(nombre_persona)
+        elif card_type == "Dueño":
+            duenos.append(nombre_persona)
+        elif card_type == "Donante":
+            donantes.append(nombre_persona)
+        elif card_type == "Guardian":
+            guardian_nombre = pet.get("nombre_persona", "Unknown")
+            rescates = pet.get("rescates", "0")
+            guardians.append((guardian_nombre, rescates))
+
+    if veterinarios:
+        with ui.column().classes('pet-card'):
+            with ui.column().classes('pet-photo-container'):
+                photo_style = f'background-image: url("https://drive.google.com/thumbnail?id=1i7EqVspmhDu35i-8M_qt65s-ErtIMbFW&sz=w1000&format=png"); background-size: 60%;'
+                ui.column().classes('pet-photo').style(photo_style)
+                ui.column().classes('pet-img')
+                ui.label(f'Total Veterinarios: {len(veterinarios)}').classes('description-text')
+
+            with ui.column().classes('description-blue interesados'):
+                with ui.column().classes('pet-card bone-blue'):
+                    ui.label('Veterinarios')
+                for nombre in veterinarios:
+                    ui.label(nombre).classes('description-text')
+
+    if duenos:
+        with ui.column().classes('pet-card'):
+            with ui.column().classes('pet-photo-container'):
+                photo_style = f'background-image: url("https://drive.google.com/thumbnail?id=1jIdsfWm2_U8uiSDIw261POt-V9buMy5I&sz=w1000&format=png"); background-size: 60%;'
+                ui.column().classes('pet-photo').style(photo_style)
+                ui.column().classes('pet-img')
+                ui.label(f'Total Dueños: {len(duenos)}').classes('description-text')
+
+            with ui.column().classes('description-blue interesados'):
+                with ui.column().classes('pet-card bone-blue'):
+                    ui.label('Dueños')
+                for nombre in duenos:
+                    ui.label(nombre).classes('description-text')
+
+    if donantes:
+        with ui.column().classes('pet-card'):
+            with ui.column().classes('pet-photo-container'):
+                photo_style = f'background-image: url("https://drive.google.com/thumbnail?id=1m1K6tE0BJ0nugVpM2sedtoRKt7vr5UHG&sz=w1000&format=png"); background-size: 60%;'
+                ui.column().classes('pet-photo').style(photo_style)
+                ui.column().classes('pet-img')
+                ui.label(f'Total Donantes: {len(donantes)}').classes('description-text')
+
+            with ui.column().classes('description-blue interesados'):
+                with ui.column().classes('pet-card bone-blue'):
+                    ui.label('Donantes')
+                for nombre in donantes:
+                    ui.label(nombre).classes('description-text')
+
+    if guardians:
+        with ui.column().classes('pet-card'):
+            with ui.column().classes('pet-photo-container'):
+                photo_style = f'background-image: url("https://drive.google.com/thumbnail?id=1hyQfKd1gq_naMGoxw_Gp1ceLEBM8eubI&sz=w1000&format=png"); background-size: 60%;'
+                ui.column().classes('pet-photo').style(photo_style)
+                ui.column().classes('pet-img')
+                ui.label(f'Total Guardians: {len(guardians)}').classes('description-text')
+
+            with ui.column().classes('description-blue interesados'):
+                with ui.column().classes('pet-card bone-blue'):
+                    ui.label('Guardians')
+                for guardian_nombre, rescates in guardians:
+                    ui.label(f'{guardian_nombre} - Rescates: {rescates}').classes('description-text')
+
+
 @ui.page('/interesados')
 async def interesados_page():
-    ui.add_css(common_css + additional_css)
+    ui.add_css(common_css + additional_css + '''
+        body {
+            background-image: url("https://drive.google.com/thumbnail?id=1CGBcQQGXPmIJGZvcngQ5beM2YuMjfmv1&sz=w1000&format=png");
+            background-size: 100% 100%;
+            background-position: center;
+            background-repeat: no-repeat;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+            font-family: 'Georgia', serif;
+        }
+    ''')
 
     with ui.column().classes('w-full h-full items-center no-gap'):
         create_header_nav()
@@ -98,49 +196,57 @@ async def interesados_page():
             ui.label('I N T E R E S A D O S').classes('page-title')
 
         with ui.row().classes('container overflow-x-auto'):
-            pet_data = await broker.fetch_data('view_interesados')
+            pet_data = await broker.fetch_data('vista_partes_involucradas')
             if pet_data:
-                for pet in pet_data:
-                    create_pet_card(pet)
+                create_interesados_cards(pet_data)
             else:
                 ui.label('No hay mascotas disponibles').classes('text-lg text-gray-500')
 
 
 def create_veterinaria_pet_card(pet_data):
-    if pet_data.get("genero") == "Macho":
-        paw_number_class = 'paw-number-blue'
+    if pet_data.get("genero_mascota") == "Macho":
         description_class = 'description-blue'
         bone_class = 'bone-blue'
     else:
-        paw_number_class = 'paw-number-pink'
         description_class = 'description-pink'
         bone_class = 'bone-pink'
 
     with ui.column().classes('pet-card'):
         with ui.column().classes('pet-photo-container'):
-            photo_style = f'background-image: url({pet_data["foto"]});' if pet_data.get("foto") else ''
+            photo_style = f'background-image: url({pet_data["foto_mascota"]});' if pet_data.get("foto_mascota") else ''
             ui.column().classes('pet-photo').style(photo_style)
-
+            ui.column().classes('pet-img')
             vaccine_style = f'background-image: url({pet_data["imagen_vacuna"]});' if pet_data.get("imagen_vacuna") else ''
-            ui.column().classes(paw_number_class).style(vaccine_style)
+            ui.column().classes('vaccine-photo').style(vaccine_style)
 
         with ui.column().classes(description_class + ' description-vaccine'):
             with ui.column().classes(f'pet-card {bone_class}'):
                 ui.label(pet_data.get('nombre_mascota', 'Unknown Pet'))
 
-            ui.label(f'Animal: {pet_data.get("animal", "Unknown")}').classes('description-text')
-            ui.label(f'Peso: {pet_data.get("estado", "N/A")}').classes('description-text')
-            ui.label(f'Estado: {pet_data.get("temperamento", "N/A")}').classes('description-text')
-            ui.label(f'Id vacuna: {pet_data.get("treat", "N/A")}').classes('description-text')
-            ui.label(f'Nombre vacuna: {pet_data.get("comida", "N/A")}').classes('description-text')
-            ui.label(f'Fecha vacunación: {pet_data.get("racion_kg", "0")} kg').classes('description-text')
+            ui.label(f'Animal: {pet_data.get("tipo_animal", "Unknown")}').classes('description-text')
+            ui.label(f'Peso: {pet_data.get("peso_mascota", "N/A")}').classes('description-text')
+            ui.label(f'Estado: {pet_data.get("estado_mascota", "N/A")}').classes('description-text')
+            ui.label(f'Id vacuna: {pet_data.get("id_vacuna", "N/A")}').classes('description-text')
+            ui.label(f'Nombre vacuna: {pet_data.get("nombre_vacuna", "N/A")}').classes('description-text')
+            ui.label(f'Fecha vacunación: {pet_data.get("fecha_vacunacion", "0")}').classes('description-text')
 
         ui.column().classes('pet-card vaccine')
 
 
 @ui.page('/veterinaria')
 async def veterinaria_page():
-    ui.add_css(common_css + additional_css)
+    ui.add_css(common_css + additional_css + '''
+        body {
+            background-image: url("https://drive.google.com/thumbnail?id=1y6uSIpKMcPm2lGZ_h0DEp_sHd-PDvGm7&sz=w1000&format=png");
+            background-size: 100% 100%;
+            background-position: center;
+            background-repeat: no-repeat;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+            font-family: 'Georgia', serif;
+        }
+    ''')
 
     with ui.column().classes('w-full h-full items-center no-gap'):
         create_header_nav()
@@ -202,16 +308,6 @@ additional_css = '''
 '''
 
 common_css = '''    
-        body {
-            background-image: url("https://drive.google.com/thumbnail?id=1NoLgwKw_wqB7kbtcBBigVNlxZ3Xbqj3A&sz=w1000&format=png");
-            background-size: 100% 100%;
-            background-position: center;
-            background-repeat: no-repeat;
-            height: 100vh;
-            margin: 0;
-            overflow: hidden;
-            font-family: 'Georgia', serif;
-        }
         .header {
             background-image: url("https://drive.google.com/thumbnail?id=1rq1WFWfhi17QR-G8k-Mx3gh-6CMgZvVg&sz=w1000&format=png");
             background-size: contain;
@@ -319,8 +415,11 @@ common_css = '''
             color: #474533;
             position: relative;
         }
+        .description-blue.interesados { 
+            justify-content: center;
+        }
         .description-pink {
-            background-color: #FBF7D2;
+            background-color: #f6f1f5;
             border: 5px solid #F7C1D8;
             width: 90%;
             height: 60%;
@@ -377,12 +476,12 @@ common_css = '''
         }
         .pet-photo {
             background-size: 100% 100%;
-                background-repeat: no-repeat;
-                background-image: url("https://lh3.googleusercontent.com/d/1_UBEmmBTTvt4mihRm-BevaqYvmFu2mt-=w1000?authuser=0");
-                background-position: center;
-                border-radius: 50%;
-                width: 80%;
-                height: 80%;
+            background-repeat: no-repeat;
+            background-image: url("https://lh3.googleusercontent.com/d/1_UBEmmBTTvt4mihRm-BevaqYvmFu2mt-=w1000?authuser=0");
+            background-position: center;
+            border-radius: 50%;
+            width: 80%;
+            height: 80%;
             margin: 0 auto;
             margin-top: 2vh;
             z-index: 1;
@@ -414,6 +513,23 @@ common_css = '''
             }
             .no-gap {
                 gap: unset;
+            }
+            .vaccine-photo {
+                border-radius: 30px 0% 30px 0%;
+                border: 5px solid #C4292F;
+                width: 8vh;
+                height: 8vh;
+                background-size: 100% 100%;
+                background-repeat: no-repeat;
+                background-position: center;
+                position: absolute;
+                top: 0;
+                left: 0;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                padding-top: 10%;
+                z-index: 100;
             }
         '''
 
