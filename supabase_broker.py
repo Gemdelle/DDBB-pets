@@ -138,6 +138,7 @@ def main():
             padding-top: 10%;
             color: #474533;
             font-size: 2.5vh;
+            z-index: 100;
         }
         .description {
             background-color: #D3ECD7;
@@ -178,25 +179,33 @@ def main():
             white-space: nowrap;  /* Evita que los elementos se ajusten a una nueva línea */
         }
         .pet-img {
-            width: 86%;
-            height: 50%;
+            width: 100%;
+            height: 100%;
             position: absolute;
-            top: 2vh;
-            background-size: contain;
+            top: 0;
+            background-size: 100% 100%;
             background-repeat: no-repeat;
-            background-image: url("https://drive.google.com/thumbnail?id=1rYGlNaM67-TTWrBl-6wOEBcftcl0LSsb&sz=w1000&format=png");
+            background-image: url("https://drive.google.com/thumbnail?id=1iVJXodlKPDRGEbRbwMMlmJI1yprGCNfL&sz=w1000&format=png");
             background-position: center;
+            z-index: 99;
         }
         .pet-photo {
-            background-size: contain;
+            background-size: 100% 100%;
             background-repeat: no-repeat;
             background-image: url("https://lh3.googleusercontent.com/d/1_UBEmmBTTvt4mihRm-BevaqYvmFu2mt-=w1000?authuser=0");
             background-position: center;
             border-radius: 50%;
-            width: 96%;
-            height: 100%;
-            position: absolute;
+            width: 80%;
+            height: 80%;
+            margin: 0 auto;
+            margin-top: 2vh;
+            z-index: 1;
+        }
+        .pet-photo-container {
+            width: 80%;
+            height: 50%;
             top: 0;
+            position: relative;
         }
         .container {
             display: flex;
@@ -234,8 +243,9 @@ def main():
         with ui.row().classes('container overflow-x-auto'):
             # Carta de la mascota 1
             with ui.column().classes('pet-card'):
-                with ui.column().classes('pet-img'):
+                with ui.column().classes('pet-photo-container'):
                     ui.column().classes('pet-photo')
+                    ui.column().classes('pet-img')
                     ui.label('12').classes('paw-number')  # Número en la patita
                 with ui.column().classes('description'):
                     with ui.column().classes('pet-card bone-blue'):
