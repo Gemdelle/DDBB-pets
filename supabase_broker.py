@@ -11,7 +11,7 @@ class SupabaseBroker:
     def __init__(self, url: str, key: str):
         self.supabase: Client = create_client(url, key)
 
-    def fetch_data(self, view: str):
+    async def fetch_data(self, view: str):
         try:
             response = self.supabase.table(view).select('*').execute()
             return response.data
@@ -20,38 +20,40 @@ class SupabaseBroker:
             return None
 
 
-broker = SupabaseBroker('https://utinuuwlewcicllipaoc.supabase.co',
-                        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV0aW51dXdsZXdjaWNsbGlwYW9jIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjcwOTQxNzcsImV4cCI6MjA0MjY3MDE3N30.b449FFa7ZXqFEFcGTx2Yo9SwknQWKXYrSZYiPhwX-ig')
+broker = SupabaseBroker(
+    'https://utinuuwlewcicllipaoc.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV0aW51dXdsZXdjaWNsbGlwYW9jIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjcwOTQxNzcsImV4cCI6MjA0MjY3MDE3N30.b449FFa7ZXqFEFcGTx2Yo9SwknQWKXYrSZYiPhwX-ig'
+)
 
 
-async def load_data(view: str):
-    data = broker.fetch_data(view)
-    print(f"Fetched data: {data}")  # Debug output
-
-    if data:
-        columns = [{'label': col, 'field': col}
-                   for col in list(data[0].keys())]
-        rows = [{col: str(value).replace('\n', '')
-                 for col, value in row.items()} for row in data]
-        return columns, rows
+def create_pet_card(pet_data):
+    if pet_data["genero"] == "Macho":
+        paw_number_class = 'paw-number-blue'
+        description_class = 'description-blue'
+        bone_class = 'bone-blue'
     else:
-        return None, None
+        paw_number_class = 'paw-number-pink'
+        description_class = 'description-pink'
+        bone_class = 'bone-pink'
 
+    with ui.column().classes('pet-card'):
+        with ui.column().classes('pet-photo-container'):
+            photo_style = f'background-image: url({pet_data["foto"]});' if pet_data.get("foto") else ''
+            ui.column().classes('pet-photo').style(photo_style)
+            ui.column().classes('pet-img')
+            ui.label(str(pet_data.get('dias_estadia', ''))).classes(paw_number_class)
 
-async def update_table():
-    print("Updating table...")
-    loading_label.visible = True
-    columns, rows = await load_data('view_mascota_detalle')
-    loading_label.visible = False
-
-    if columns and rows:
-        table.columns = columns
-        table.rows = rows
-        ui.notify(f"Loaded {len(rows)} rows of data", color="green")
-        print(f"Table updated with {len(rows)} rows")
-    else:
-        ui.notify('No data available or error occurred', color="orange")
-        print("No data available or error occurred")
+        with ui.column().classes(description_class):
+            with ui.column().classes(f'pet-card {bone_class}'):
+                ui.label(pet_data['nombre_mascota'])
+            ui.label(f'Animal: {pet_data["animal"]}').classes('description-text')
+            ui.label(f'Estado: {pet_data["estado"]}').classes('description-text')
+            ui.label(f'Temperamento: {pet_data["temperamento"]}').classes('description-text')
+            ui.label(f'Treat: {pet_data["treat"]}').classes('description-text')
+            ui.label(f'Comida: {pet_data["comida"]}').classes('description-text')
+            ui.label(f'Ración: {pet_data["racion_kg"]} kg').classes('description-text')
+            ui.label(f'Peso: {pet_data["peso"]} kg').classes('description-text')
+            ui.label(f'Género: {pet_data["genero"]}').classes('description-text')
 
 def create_header_nav():
     with ui.row().classes():
@@ -65,10 +67,28 @@ def create_header_nav():
         with ui.column().classes('nav-button home-circle').on('click', lambda: ui.navigate.to('/veterinaria')):
             ui.label('V e t e r i n a r i a')
 
-@ui.page('/interesados')
-def interesados_page():
-    global table, loading_label
 
+@ui.page('/')
+async def main():
+    ui.add_css(common_css + additional_css)
+
+    with ui.column().classes('w-full h-full items-center no-gap'):
+        create_header_nav()
+
+        with ui.row().classes('title-container'):
+            ui.label('M A S C O T A S').classes('page-title')
+
+        with ui.row().classes('container overflow-x-auto'):
+            pet_data = await broker.fetch_data('view_mascota_detalle')
+            if pet_data:
+                for pet in pet_data:
+                    create_pet_card(pet)
+            else:
+                ui.label('No hay mascotas disponibles').classes('text-lg text-gray-500')
+
+
+@ui.page('/interesados')
+async def interesados_page():
     ui.add_css(common_css + additional_css)
 
     with ui.column().classes('w-full h-full items-center no-gap'):
@@ -77,14 +97,49 @@ def interesados_page():
         with ui.row().classes('title-container'):
             ui.label('I N T E R E S A D O S').classes('page-title')
 
-        ui.row().classes('container overflow-x-auto')
+        with ui.row().classes('container overflow-x-auto'):
+            pet_data = await broker.fetch_data('view_interesados')
+            if pet_data:
+                for pet in pet_data:
+                    create_pet_card(pet)
+            else:
+                ui.label('No hay mascotas disponibles').classes('text-lg text-gray-500')
 
+
+def create_veterinaria_pet_card(pet_data):
+    if pet_data.get("genero") == "Macho":
+        paw_number_class = 'paw-number-blue'
+        description_class = 'description-blue'
+        bone_class = 'bone-blue'
+    else:
+        paw_number_class = 'paw-number-pink'
+        description_class = 'description-pink'
+        bone_class = 'bone-pink'
+
+    with ui.column().classes('pet-card'):
+        with ui.column().classes('pet-photo-container'):
+            photo_style = f'background-image: url({pet_data["foto"]});' if pet_data.get("foto") else ''
+            ui.column().classes('pet-photo').style(photo_style)
+
+            vaccine_style = f'background-image: url({pet_data["imagen_vacuna"]});' if pet_data.get("imagen_vacuna") else ''
+            ui.column().classes(paw_number_class).style(vaccine_style)
+
+        with ui.column().classes(description_class + ' description-vaccine'):
+            with ui.column().classes(f'pet-card {bone_class}'):
+                ui.label(pet_data.get('nombre_mascota', 'Unknown Pet'))
+
+            ui.label(f'Animal: {pet_data.get("animal", "Unknown")}').classes('description-text')
+            ui.label(f'Peso: {pet_data.get("estado", "N/A")}').classes('description-text')
+            ui.label(f'Estado: {pet_data.get("temperamento", "N/A")}').classes('description-text')
+            ui.label(f'Id vacuna: {pet_data.get("treat", "N/A")}').classes('description-text')
+            ui.label(f'Nombre vacuna: {pet_data.get("comida", "N/A")}').classes('description-text')
+            ui.label(f'Fecha vacunación: {pet_data.get("racion_kg", "0")} kg').classes('description-text')
+
+        ui.column().classes('pet-card vaccine')
 
 
 @ui.page('/veterinaria')
-def veterinaria_page():
-    global table, loading_label
-
+async def veterinaria_page():
     ui.add_css(common_css + additional_css)
 
     with ui.column().classes('w-full h-full items-center no-gap'):
@@ -93,10 +148,15 @@ def veterinaria_page():
         with ui.row().classes('title-container'):
             ui.label('V E T E R I N A R I A').classes('page-title')
 
-        ui.row().classes('container overflow-x-auto')
+        with ui.row().classes('container overflow-x-auto'):
+            pet_data = await broker.fetch_data('vista_historial_medico')
+            if pet_data:
+                for pet in pet_data:
+                    create_veterinaria_pet_card(pet)
+            else:
+                ui.label('No hay mascotas disponibles').classes('text-lg text-gray-500')
 
 
-# Add these CSS classes to your existing CSS
 additional_css = '''
     .pet-card.bone-yellow {
         background-image: url("https://drive.google.com/thumbnail?id=1fnXmKmLMcoMN9k9OIrcSzComyw6fPCSb&sz=w1000&format=png");
@@ -118,6 +178,26 @@ additional_css = '''
         justify-content: center;
         align-items: center;
         text-transform: uppercase;
+        position: absolute;
+        top: -3vh;
+        height: 7vh;
+        width: 18vh;
+        z-index: 100;
+    }
+    .pet-card.vaccine {
+        background-image: url("https://drive.google.com/thumbnail?id=1i7EqVspmhDu35i-8M_qt65s-ErtIMbFW&sz=w1000&format=png");
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: contain;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: absolute;
+        bottom: -3vh;
+        right: -2vh;
+        height: 9vh;
+        width: 9vh;
+        z-index: 100;
     }
 '''
 
@@ -179,6 +259,11 @@ common_css = '''
             justify-content: center;
             align-items: center;
             text-transform: uppercase;
+            position: absolute;
+            top: -3vh;
+            height: 7vh;
+            width: 18vh;
+            z-index: 100;
         }
         .pet-card.bone-pink {
             background-image: url("https://drive.google.com/thumbnail?id=16hd19sOhwTH7qk2VvFDQLLkpwMgtAg_A&sz=w1000&format=png");
@@ -186,7 +271,7 @@ common_css = '''
         .pet-card.bone-yellow {
             background-image: url("https://drive.google.com/thumbnail?id=1fnXmKmLMcoMN9k9OIrcSzComyw6fPCSb&sz=w1000&format=png");
         }
-        .paw-number {
+        .paw-number-blue {
             width: 8vh;
             height: 8vh;
             background-image: url("https://drive.google.com/thumbnail?id=1hyQfKd1gq_naMGoxw_Gp1ceLEBM8eubI&sz=w1000&format=png");
@@ -203,7 +288,24 @@ common_css = '''
             font-size: 2.5vh;
             z-index: 100;
         }
-        .description {
+        .paw-number-pink {
+            width: 8vh;
+            height: 8vh;
+            background-image: url("https://drive.google.com/thumbnail?id=1UcwqAisO684D-ZK4Bv9J0bHKc8vwB2sz&sz=w1000&format=png");
+            background-size: contain;
+            background-repeat: no-repeat;
+            position: absolute;
+            top: 0;
+            left: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding-top: 10%;
+            color: #474533;
+            font-size: 2.5vh;
+            z-index: 100;
+        }
+        .description-blue {
             background-color: #D3ECD7;
             border: 5px solid #5CDAE1;
             width: 90%;
@@ -213,8 +315,29 @@ common_css = '''
             align-items: center;
             justify-content: flex-end;
             gap: unset;
-            padding: 2vh 2vh !important;
+            padding: 3vh 2vh 1vh 2vh !important;
             color: #474533;
+            position: relative;
+        }
+        .description-pink {
+            background-color: #FBF7D2;
+            border: 5px solid #F7C1D8;
+            width: 90%;
+            height: 60%;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: unset;
+            padding: 3vh 2vh 1vh 2vh !important;
+            color: #474533;
+            position: relative;
+        }
+        .description-text {
+            font-size: 1.4vh;
+        }
+        .description-vaccine { 
+            justify-content: center;
         }
         .bone-name {
             background-color: #FFC0CB;
@@ -266,8 +389,8 @@ common_css = '''
         }
         .pet-photo-container {
             width: 80%;
-            height: 45%;
-            top: 0;
+            height: 60%;
+            top: 4vh;
             position: relative;
             }
             .container {
@@ -294,107 +417,4 @@ common_css = '''
             }
         '''
 
-@ui.page('/')
-def main():
-    global table, loading_label
-
-    ui.add_css(common_css + additional_css)
-
-    with ui.column().classes('w-full h-full items-center no-gap'):
-        create_header_nav()
-
-        with ui.row().classes('title-container'):
-            ui.label('M A S C O T A S').classes('page-title')
-
-        with ui.row().classes('container overflow-x-auto'):
-            # Carta de la mascota 1
-            with ui.column().classes('pet-card'):
-                with ui.column().classes('pet-photo-container'):
-                    ui.column().classes('pet-photo')
-                    ui.column().classes('pet-img')
-                    ui.label('12').classes('paw-number')  # Número en la patita
-                with ui.column().classes('description'):
-                    with ui.column().classes('pet-card bone-blue'):
-                        ui.label('Lala')
-                    ui.label('Animal: Perro')
-                    ui.label('Pelaje: Corto')
-                    ui.label('Estado: Rescatado')
-                    ui.label('Temperamento: Amistoso')
-                    ui.label('Treat: Comida')
-                    ui.label('Comida: Ración')
-
-
-            with ui.column().classes('pet-card bone-blue'):
-                ui.label('12').classes('paw-number')  # Número en la patita
-                with ui.label('Lala').classes('bone-name'):  # Nombre en el hueso rosa central
-                    pass
-                with ui.column().classes('description'):
-                    ui.label('Animal: Perro')
-                    ui.label('Pelaje: Corto')
-                    ui.label('Estado: Rescatado')
-                    ui.label('Temperamento: Amistoso')
-                    ui.label('Treat: Comida')
-                    ui.label('Comida: Ración')
-
-            with ui.column().classes('pet-card bone-blue'):
-                ui.label('12').classes('paw-number')  # Número en la patita
-                with ui.label('Lala').classes('bone-name'):  # Nombre en el hueso rosa central
-                    pass
-                with ui.column().classes('description'):
-                    ui.label('Animal: Perro')
-                    ui.label('Pelaje: Corto')
-                    ui.label('Estado: Rescatado')
-                    ui.label('Temperamento: Amistoso')
-                    ui.label('Treat: Comida')
-                    ui.label('Comida: Ración')
-
-            with ui.column().classes('pet-card bone-blue'):
-                ui.label('12').classes('paw-number')  # Número en la patita
-                with ui.label('Lala').classes('bone-name'):  # Nombre en el hueso rosa central
-                    pass
-                with ui.column().classes('description'):
-                    ui.label('Animal: Perro')
-                    ui.label('Pelaje: Corto')
-                    ui.label('Estado: Rescatado')
-                    ui.label('Temperamento: Amistoso')
-                    ui.label('Treat: Comida')
-                    ui.label('Comida: Ración')
-
-            with ui.column().classes('pet-card bone-blue'):
-                ui.label('12').classes('paw-number')  # Número en la patita
-                with ui.label('Lala').classes('bone-name'):  # Nombre en el hueso rosa central
-                    pass
-                with ui.column().classes('description'):
-                    ui.label('Animal: Perro')
-                    ui.label('Pelaje: Corto')
-                    ui.label('Estado: Rescatado')
-                    ui.label('Temperamento: Amistoso')
-                    ui.label('Treat: Comida')
-                    ui.label('Comida: Ración')
-
-            with ui.column().classes('pet-card bone-blue'):
-                ui.label('12').classes('paw-number')  # Número en la patita
-                with ui.label('Lala').classes('bone-name'):  # Nombre en el hueso rosa central
-                    pass
-                with ui.column().classes('description'):
-                    ui.label('Animal: Perro')
-                    ui.label('Pelaje: Corto')
-                    ui.label('Estado: Rescatado')
-                    ui.label('Temperamento: Amistoso')
-                    ui.label('Treat: Comida')
-                    ui.label('Comida: Ración')
-
-            with ui.column().classes('pet-card bone-blue'):
-                ui.label('12').classes('paw-number')  # Número en la patita
-                with ui.label('Lala').classes('bone-name'):  # Nombre en el hueso rosa central
-                    pass
-                with ui.column().classes('description'):
-                    ui.label('Animal: Perro')
-                    ui.label('Pelaje: Corto')
-                    ui.label('Estado: Rescatado')
-                    ui.label('Temperamento: Amistoso')
-                    ui.label('Treat: Comida')
-                    ui.label('Comida: Ración')
-
 ui.run()
-
