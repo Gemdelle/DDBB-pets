@@ -112,6 +112,10 @@ def main():
             background-position: center;
             background-repeat: no-repeat;
             background-size: contain;
+            display:flex;
+            justify-content: center;
+            align-items: center;
+            text-transform: uppercase;
         }
         .pet-card.bone-pink {
             background-image: url("https://drive.google.com/thumbnail?id=16hd19sOhwTH7qk2VvFDQLLkpwMgtAg_A&sz=w1000&format=png");
@@ -120,29 +124,31 @@ def main():
             background-image: url("https://drive.google.com/thumbnail?id=1fnXmKmLMcoMN9k9OIrcSzComyw6fPCSb&sz=w1000&format=png");
         }
         .paw-number {
-            width: 50px;
-            height: 50px;
+            width: 8vh;
+            height: 8vh;
             background-image: url("https://drive.google.com/thumbnail?id=1hyQfKd1gq_naMGoxw_Gp1ceLEBM8eubI&sz=w1000&format=png");
             background-size: contain;
             background-repeat: no-repeat;
             position: absolute;
-            top: 10px;
-            left: 10px;
+            top: 0;
+            left: 0;
             display: flex;
             justify-content: center;
             align-items: center;
             padding-top: 10%;
             color: #474533;
+            font-size: 2.5vh;
         }
         .description {
             background-color: #D3ECD7;
             border: 5px solid #5CDAE1;
             width: 90%;
-            height: 53%;
+            height: 60%;
             border-radius: 10px;
             display: flex;
             align-items: center;
-            justify-content: center;
+            justify-content: flex-end;
+            gap: unset;
             padding: 2vh 2vh !important;
             color: #474533;
         }
@@ -172,14 +178,25 @@ def main():
             white-space: nowrap;  /* Evita que los elementos se ajusten a una nueva línea */
         }
         .pet-img {
-            width: 80%;
+            width: 86%;
             height: 50%;
             position: absolute;
-            top: 0;
+            top: 2vh;
             background-size: contain;
             background-repeat: no-repeat;
             background-image: url("https://drive.google.com/thumbnail?id=1rYGlNaM67-TTWrBl-6wOEBcftcl0LSsb&sz=w1000&format=png");
             background-position: center;
+        }
+        .pet-photo {
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-image: url("https://lh3.googleusercontent.com/d/1_UBEmmBTTvt4mihRm-BevaqYvmFu2mt-=w1000?authuser=0");
+            background-position: center;
+            border-radius: 50%;
+            width: 96%;
+            height: 100%;
+            position: absolute;
+            top: 0;
         }
         .container {
             display: flex;
@@ -218,17 +235,18 @@ def main():
             # Carta de la mascota 1
             with ui.column().classes('pet-card'):
                 with ui.column().classes('pet-img'):
+                    ui.column().classes('pet-photo')
                     ui.label('12').classes('paw-number')  # Número en la patita
-                
-                
                 with ui.column().classes('description'):
-
+                    with ui.column().classes('pet-card bone-blue'):
+                        ui.label('Lala')
                     ui.label('Animal: Perro')
                     ui.label('Pelaje: Corto')
                     ui.label('Estado: Rescatado')
                     ui.label('Temperamento: Amistoso')
                     ui.label('Treat: Comida')
                     ui.label('Comida: Ración')
+
 
             with ui.column().classes('pet-card bone-blue'):
                 ui.label('12').classes('paw-number')  # Número en la patita
