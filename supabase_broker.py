@@ -1,6 +1,5 @@
 from supabase import create_client, Client
 from nicegui import ui
-import asyncio
 import warnings
 
 warnings.filterwarnings(
@@ -24,6 +23,7 @@ broker = SupabaseBroker(
     'https://utinuuwlewcicllipaoc.supabase.co',
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV0aW51dXdsZXdjaWNsbGlwYW9jIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjcwOTQxNzcsImV4cCI6MjA0MjY3MDE3N30.b449FFa7ZXqFEFcGTx2Yo9SwknQWKXYrSZYiPhwX-ig'
 )
+
 
 def create_pet_card(pet_data):
     if pet_data["genero"] == "Macho":
@@ -53,6 +53,7 @@ def create_pet_card(pet_data):
             ui.label(f'Ración: {pet_data["racion_kg"]} kg').classes('description-text')
             ui.label(f'Peso: {pet_data["peso"]} kg').classes('description-text')
 
+
 def create_header_nav():
     with ui.row().classes():
         ui.row().classes('header')
@@ -68,7 +69,7 @@ def create_header_nav():
 
 @ui.page('/')
 async def main():
-    ui.add_css(common_css + additional_css + '''
+    ui.add_css(common_css + '''
         body {
             background-image: url("https://drive.google.com/thumbnail?id=1NoLgwKw_wqB7kbtcBBigVNlxZ3Xbqj3A&sz=w1000&format=png");
             background-size: 100% 100%;
@@ -176,7 +177,7 @@ def create_interesados_cards(pet_data):
 
 @ui.page('/interesados')
 async def interesados_page():
-    ui.add_css(common_css + additional_css + '''
+    ui.add_css(common_css + '''
         body {
             background-image: url("https://drive.google.com/thumbnail?id=1CGBcQQGXPmIJGZvcngQ5beM2YuMjfmv1&sz=w1000&format=png");
             background-size: 100% 100%;
@@ -235,7 +236,7 @@ def create_veterinaria_pet_card(pet_data):
 
 @ui.page('/veterinaria')
 async def veterinaria_page():
-    ui.add_css(common_css + additional_css + '''
+    ui.add_css(common_css + '''
         body {
             background-image: url("https://drive.google.com/thumbnail?id=1y6uSIpKMcPm2lGZ_h0DEp_sHd-PDvGm7&sz=w1000&format=png");
             background-size: 100% 100%;
@@ -262,50 +263,6 @@ async def veterinaria_page():
             else:
                 ui.label('No hay mascotas disponibles').classes('text-lg text-gray-500')
 
-
-additional_css = '''
-    .pet-card.bone-yellow {
-        background-image: url("https://drive.google.com/thumbnail?id=1fnXmKmLMcoMN9k9OIrcSzComyw6fPCSb&sz=w1000&format=png");
-        background-position: center;
-        background-repeat: no-repeat;
-        background-size: contain;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        text-transform: uppercase;
-    }
-
-    .pet-card.bone-pink {
-        background-image: url("https://drive.google.com/thumbnail?id=16hd19sOhwTH7qk2VvFDQLLkpwMgtAg_A&sz=w1000&format=png");
-        background-position: center;
-        background-repeat: no-repeat;
-        background-size: contain;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        text-transform: uppercase;
-        position: absolute;
-        top: -3vh;
-        height: 7vh;
-        width: 18vh;
-        z-index: 100;
-    }
-    .pet-card.vaccine {
-        background-image: url("https://drive.google.com/thumbnail?id=1i7EqVspmhDu35i-8M_qt65s-ErtIMbFW&sz=w1000&format=png");
-        background-position: center;
-        background-repeat: no-repeat;
-        background-size: contain;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        position: absolute;
-        bottom: -3vh;
-        right: -2vh;
-        height: 9vh;
-        width: 9vh;
-        z-index: 100;
-    }
-'''
 
 common_css = '''    
         .header {
@@ -531,6 +488,47 @@ common_css = '''
                 padding-top: 10%;
                 z-index: 100;
             }
+            .pet-card.bone-yellow {
+        background-image: url("https://drive.google.com/thumbnail?id=1fnXmKmLMcoMN9k9OIrcSzComyw6fPCSb&sz=w1000&format=png");
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: contain;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-transform: uppercase;
+    }
+
+    .pet-card.bone-pink {
+        background-image: url("https://drive.google.com/thumbnail?id=16hd19sOhwTH7qk2VvFDQLLkpwMgtAg_A&sz=w1000&format=png");
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: contain;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-transform: uppercase;
+        position: absolute;
+        top: -3vh;
+        height: 7vh;
+        width: 18vh;
+        z-index: 100;
+    }
+    .pet-card.vaccine {
+        background-image: url("https://drive.google.com/thumbnail?id=1i7EqVspmhDu35i-8M_qt65s-ErtIMbFW&sz=w1000&format=png");
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: contain;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: absolute;
+        bottom: -3vh;
+        right: -2vh;
+        height: 9vh;
+        width: 9vh;
+        z-index: 100;
+    }
         '''
 
 ui.run()
